@@ -1,0 +1,9 @@
+---
+title: "rxsim Gallery"
+---
+
+Welcome to the **rxsim gallery** — a collection of worked examples demonstrating rxsim's core features for simulating clinical trials.
+
+For an overview of rxsim concepts and API, see the [rxsim documentation](https://boehringer-ingelheim.github.io/rxsim).
+
+Browse the [examples](examples.qmd) below to see rxsim in action across different trial designs, endpoints, and adaptive strategies.
