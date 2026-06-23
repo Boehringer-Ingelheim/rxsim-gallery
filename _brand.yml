@@ -1,0 +1,43 @@
+color:
+  palette:
+   dark-green: "#08312A"
+   accent-green: "#00E47C"
+   warm-gray: "#E5E3DE"
+   light-gray: "#F6F5F3"
+   white: "#ffffff"
+   black: "#000000"
+   yellow: "#e18600"
+   blue: "#076d7e"
+   red: "#86251b"
+   violet: "#5d4495"
+   background: light-gray
+   foreground: black
+   primary: yellow
+   secondary: violet
+   tertiary: red
+
+typography:
+  base:
+    family: Boehringer Forward Text
+    size: 0.9rem
+  headings:
+    family: Boehringer Forward Head
+    color: dark-green
+  monospace:
+    family: Space Mono
+  monospace-inline:
+    family: Space Mono
+  monospace-block:
+    family: Space Mono
+  link:
+    color: yellow
+
+logo:
+ medium: "./assets/img/logo.svg"
+
+defaults:
+  bootstrap:
+    defaults:
+      navbar-bg: $brand-dark-green
+      navbar-fg: $brand-accent-green
+      navbar-hl: $brand-light-gray

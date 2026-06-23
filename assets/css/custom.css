@@ -1,0 +1,247 @@
+/* fonts */
+@font-face {
+  font-family: "Boehringer Forward Text";
+  font-weight: normal;
+  font-style: normal;
+  src: url("../fonts/Boehringer-Forward/Text.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Text";
+  font-weight: bold;
+  font-style: normal;
+  src: url("../fonts/Boehringer-Forward/Text-Bd.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Text";
+  font-weight: normal;
+  font-style: italic;
+  src: url("../fonts/Boehringer-Forward/Text-It.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Text";
+  font-weight: bold;
+  font-style: italic;
+  src: url("../fonts/Boehringer-Forward/Text-BdIt.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Head";
+  font-weight: normal;
+  font-style: normal;
+  src: url("../fonts/Boehringer-Forward/Head.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Head";
+  font-weight: bold;
+  font-style: normal;
+  src: url("../fonts/Boehringer-Forward/Head-Bd.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Head";
+  font-weight: normal;
+  font-style: italic;
+  src: url("../fonts/Boehringer-Forward/Head-It.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Boehringer Forward Head";
+  font-weight: bold;
+  font-style: italic;
+  src: url("../fonts/Boehringer-Forward/Head-BdIt.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-weight: normal;
+  font-style: normal;
+  src: url("../fonts/Space-Mono/Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-weight: bold;
+  font-style: normal;
+  src: url("../fonts/Space-Mono/Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-weight: normal;
+  font-style: italic;
+  src: url("../fonts/Space-Mono/Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-weight: bold;
+  font-style: italic;
+  src: url("../fonts/Space-Mono/BoldItalic.ttf") format("truetype");
+}
+
+/* use custom monospaced font face for keyboard  */
+kbd {
+  font-family: "Space Mono";
+}
+
+/* Style the slide titles */
+.reveal h1,
+.reveal h2 {
+  color: #08312a; /* BI Dark Green for contrast */
+  padding: 0.5em;
+  border-radius: 5px;
+  font-size: 1.2em; /* Slightly smaller text */
+  font-family: "Boehringer Forward Head", sans-serif;
+}
+
+.reveal h5 {
+  color: #076d7e; /* BI Violet */
+  font-size: 0.7em; /* Slightly smaller text */
+  font-family: "Boehringer Forward Head", sans-serif;
+}
+
+/* Make body text slightly smaller */
+.reveal p {
+  font-size: 0.85em; /* Adjust this value as needed */
+  font-family: "Boehringer Forward Text", sans-serif;
+  color: #000000;
+}
+
+.reveal p strong {
+  color: #5d4495;
+}
+
+.reveal p em {
+  color: #e18600;
+}
+
+.reveal .title {
+  font-size: 1.2em;
+}
+
+.reveal .subtitle {
+  font-style: italic;
+  color: #00e47c;
+}
+
+.quarto-title-author-name {
+  font-size: 0.6em;
+  color: #08312A;
+}
+
+p.date {
+  font-size: 0.6em;
+}
+
+.reveal blockquote,
+.reveal blockquote p {
+  font-size: 0.8em;
+  color: #86251b;
+}
+
+/* Style unordered and ordered lists */
+.reveal ul,
+.reveal ol {
+  font-size: 0.8em; /* Slightly smaller text */
+  margin-left: 1.5em; /* Indent bullets */
+  line-height: 1.4; /* Improve readability */
+}
+
+.reveal ul li::marker {
+  content: "";
+}
+
+/* css styles */
+.reveal .slide-background-content {
+  background-color: #f6f5f3;
+}
+
+/* other */
+
+/* annorate code blocks */
+code.sourceCode.r::before {
+  content: "R Console";
+  float: right;
+  padding-right: 1.25em;
+}
+
+code.sourceCode.bash::before {
+  content: "Terminal";
+  float: right;
+  padding-right: 1.25em;
+}
+
+code span.co {
+  opacity: 0.5;
+}
+
+/* table readability */
+tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+td {
+  border: none !important;
+}
+
+div#emoji > table > thead > tr {
+  font-size: 2em;
+}
+
+/* mermaid figure size */
+svg.mermaid-js {
+  max-width: 80% !important;
+}
+
+svg.mermaid-js p {
+  color: #08312a;
+}
+
+#mermaid-1 .node rect,
+#mermaid-2 .node rect{
+  fill: #c5c3ee !important;
+  stroke-width: 0px !important;
+}
+
+#mermaid-1 .edgeLabel,
+#mermaid-1 .edgeLabel p {
+  background-color: #f6f5f3 !important;
+}
+
+#mermaid-2 {
+  max-width: 80% !important;
+}
+
+/* logos & icons */
+.ico {
+  vertical-align: -0.375em;
+  height: 2em;
+  margin: 0em;
+}
+
+.x {
+  text-align: center;
+}
+
+div.columns {
+  display: flex;
+  align-items: center;
+}
+
+.reveal div.sourceCode pre code{
+  max-height: 750px;
+}
+
+.code-copy-button{
+  margin-top: 0.85em;
+  margin-right: 1.25em;
+}
+
+.reveal pre code {
+  background-color: #E5E3DE;
+  color: #e18600;
+}
