@@ -1,5 +1,6 @@
 ---
 title: "Example 1: Two arm | Fixed design | Continuous"
+categories: [two-arm, fixed design, continuous, t-test]
 ---
 
 
@@ -13,6 +14,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(rxsim)
+library(ggplot2)
 ```
 
 This example simulates a parallel-group trial evaluating a new treatment against
@@ -30,9 +32,9 @@ is the simplest complete rxsim workflow using the generator API
 sample_size   <- 100
 arms          <- c("pbo", "trt")
 allocation    <- c(1, 1)
-delta         <- 0.2              # true effect (SD units)
-enrollment_fn <- function(n) rexp(n, rate = 1)
-dropout_fn    <- function(n) rexp(n, rate = 0.01)
+delta         <- 0.57             # true effect (SD units)
+enrollment_fn <- function(n) c(1, rep(0, n - 1))  # all enroll at t = 1 (single look)
+dropout_fn    <- function(n) rep(0, n)            # no dropout
 
 scenario <- tidyr::expand_grid(
   sample_size = sample_size,
@@ -115,6 +117,8 @@ Running 500 replicates across a range of `delta` values reveals how power
 scales with effect size for n = 100 at alpha = 0.05.
 
 ```{r power_curve, cache=TRUE}
+#| code-fold: true
+#| code-summary: "Power curve sweep across effect sizes (delta = 0.00 to 0.60)"
 set.seed(42)
 deltas     <- seq(0, 0.6, by = 0.15)
 n_reps_pw  <- 200
@@ -140,12 +144,18 @@ power_df <- do.call(rbind, lapply(deltas, function(d) {
 ```
 
 ```{r plot_power}
-plot(power_df$delta, power_df$power, type = "b", pch = 19,
-     xlab = "True effect delta (SD units)", ylab = "Empirical power",
-     main = "Power curve: n = 100, alpha = 0.05",
-     ylim = c(0, 1))
-abline(h = 0.80, lty = 2, col = "grey50")
-abline(h = 0.05, lty = 3, col = "grey50")
+ggplot(power_df, aes(delta, power)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 0.80, linetype = 2, colour = "grey50") +
+  geom_hline(yintercept = 0.05, linetype = 3, colour = "grey50") +
+  coord_cartesian(ylim = c(0, 1)) +
+  labs(
+    x = "True effect delta (SD units)",
+    y = "Empirical power",
+    title = "Power curve: n = 100, alpha = 0.05"
+  ) +
+  theme_minimal()
 ```
 
 ## Next steps

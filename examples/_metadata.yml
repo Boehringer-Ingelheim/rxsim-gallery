@@ -1,0 +1,5 @@
+# Quarto metadata applied to all examples
+
+execute:
+  warning: false
+  message: false

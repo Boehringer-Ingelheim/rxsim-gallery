@@ -4,4 +4,8 @@ listing:
   contents: examples
   type: grid
   sort: "title"
+  categories: true
+  filter-ui: true
+  sort-ui: true
+  image-placeholder: assets/img/logo.svg
 ---

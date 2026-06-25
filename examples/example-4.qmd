@@ -1,5 +1,6 @@
 ---
 title: "Example 4: Two-arm | Fixed design | Single continuous endpoint | Bayesian Go/No-Go with placebo borrowing"
+categories: [two-arm, fixed design, continuous, Bayesian, "Go/No-Go", borrowing]
 ---
 
 
@@ -20,6 +21,7 @@ library(RBesT)
 
 # Helpers
 library(dplyr)
+library(ggplot2)
 
 set.seed(777)
 ```
@@ -52,7 +54,7 @@ continuous endpoint** and a **single final analysis**.
 `delta = 0.1` defines the minimum treatment-placebo difference of clinical
 relevance. `gamma = 0.8` requires 80% posterior probability of exceeding that
 threshold before a Go decision is issued. The true simulated effect `delta_true
-= 0.30` lies above `delta`, so a well-powered trial should frequently result in
+= 0.40` lies above `delta`, so a well-powered trial should frequently result in
 a Go.
 
 ```{r scenario}
@@ -63,7 +65,7 @@ arms        <- c("placebo", "treatment")
 
 # Data-generating truth for this simulation example
 mu_placebo_true <- 0.00
-delta_true      <- 0.30  # true treatment - placebo mean difference
+delta_true      <- 0.40  # true treatment - placebo mean difference
 sigma_known     <- 1.0
 
 # Bayesian decision thresholds
@@ -78,8 +80,8 @@ scenario <- tidyr::expand_grid(
   gamma       = gamma
 )
 
-enrollment_fn <- function(n) rexp(n, rate = 1)
-dropout_fn    <- function(n) rexp(n, rate = 0.01)
+enrollment_fn <- function(n) c(1, rep(0, n - 1))  # all enroll at t = 1 (single look)
+dropout_fn    <- function(n) rep(0, n)            # no dropout
 ```
 
 ## Historical placebo dataset and priors
@@ -98,6 +100,8 @@ strongly the historical data pulls the posterior. The treatment arm uses
 entirely by the current data.
 
 ```{r priors}
+#| code-fold: true
+#| code-summary: "Historical placebo borrowing and robustified Bayesian priors"
 hist_placebo <- data.frame(
   study = c("H1", "H2", "H3"),
   n     = c(24, 18, 20),
@@ -170,6 +174,8 @@ same posterior difference distribution, yielding a 95% credible interval for
 Delta = mu_T - mu_P.
 
 ```{r trigger}
+#| code-fold: true
+#| code-summary: "Bayesian Go/No-Go analysis generator with posterior summaries"
 analysis_generators <- list(
   final = list(
     trigger = enroll_trigger(1.0, sample_size),
@@ -244,7 +250,7 @@ The credible interval columns `delta_q025`, `delta_q500`, and `delta_q975`
 characterise the posterior uncertainty about the treatment effect Δ; with n=80
 and σ=1, the posterior is still relatively wide. In practice you would run
 thousands of replicates and report the Go probability under both the null (Δ =
-0) and the alternative (e.g., Δ = 0.30) to assess the design's operating
+0) and the alternative (e.g., Δ = 0.40) to assess the design's operating
 characteristics. See [Example 5](example-5.html) for a seamless design that
 builds on this Bayesian decision rule.
 
@@ -263,6 +269,8 @@ the Go probability under a range of true treatment effects: near zero for small
 effects (false Go = type I error analog) and approaching 1 for large effects.
 
 ```{r go_curve, cache=TRUE}
+#| code-fold: true
+#| code-summary: "Go probability sweep across true treatment effects"
 set.seed(77)
 n_reps_pw   <- 200
 delta_sweep <- c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)
@@ -314,20 +322,24 @@ go_df <- do.call(rbind, lapply(delta_sweep, function(dt) {
 ```
 
 ```{r plot_go}
-plot(go_df$delta_true, go_df$go_prob, type = "b", pch = 19,
-     col = "steelblue",
-     xlab = "True treatment - placebo difference",
-     ylab = "Go probability",
-     main = sprintf("Go/No-Go operating characteristics (n = %d)", sample_size),
-     ylim = c(0, 1))
-abline(v = delta, lty = 3, col = "grey50")  # decision threshold
-abline(h = gamma, lty = 2, col = "grey50")  # gamma threshold
-legend("topleft",
-       legend = c(
-         sprintf("delta threshold = %.1f", delta),
-         sprintf("gamma threshold = %.1f", gamma)
-       ),
-       lty = c(3, 2), col = "grey50")
+ggplot(go_df, aes(delta_true, go_prob)) +
+  geom_line(colour = "steelblue") +
+  geom_point(size = 2, colour = "steelblue") +
+  geom_vline(xintercept = delta, linetype = 3, colour = "grey50") +
+  geom_hline(yintercept = gamma, linetype = 2, colour = "grey50") +
+  annotate("text", x = delta, y = 0.02,
+           label = sprintf("delta threshold = %.1f", delta),
+           hjust = -0.05, colour = "grey40", size = 3) +
+  annotate("text", x = min(go_df$delta_true), y = gamma,
+           label = sprintf("gamma threshold = %.1f", gamma),
+           vjust = -0.5, hjust = 0, colour = "grey40", size = 3) +
+  coord_cartesian(ylim = c(0, 1)) +
+  labs(
+    x = "True treatment - placebo difference",
+    y = "Go probability",
+    title = sprintf("Go/No-Go operating characteristics (n = %d)", sample_size)
+  ) +
+  theme_minimal()
 ```
 
 ## Next steps

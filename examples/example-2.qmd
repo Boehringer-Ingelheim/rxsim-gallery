@@ -1,5 +1,6 @@
 ---
 title: "Example 2: Two arm | Fixed design | Two correlated continuous endpoints | t-test"
+categories: [two-arm, fixed design, continuous, correlated endpoints, multiplicity, t-test]
 ---
 
 
@@ -18,6 +19,7 @@ library(rxsim)
 # Utilities
 library(dplyr)
 library(MASS)   # for mvrnorm (simulate correlated endpoints)
+library(ggplot2)
 ```
 
 Many trials evaluate co-primary or key secondary endpoints simultaneously.
@@ -58,8 +60,8 @@ mu1_pbo <- 0.00         # Control mean for endpoint1
 mu2_pbo <- 0.00         # Control mean for endpoint2
 
 # Treatment effects (mean shifts)
-delta1  <- 0.30         # Treatment - control difference for endpoint1
-delta2  <- 0.20         # Treatment - control difference for endpoint2
+delta1  <- 0.65         # Treatment - control difference for endpoint1
+delta2  <- 0.60         # Treatment - control difference for endpoint2
 
 mu1_trt <- mu1_pbo + delta1
 mu2_trt <- mu2_pbo + delta2
@@ -79,15 +81,15 @@ scenario <- tidyr::expand_grid(
   delta2 = delta2
 )
 
-enrollment_fn <- function(n) rexp(n, rate = 1)
-dropout_fn    <- function(n) rexp(n, rate = 0.01)
+enrollment_fn <- function(n) c(1, rep(0, n - 1))  # all enroll at t = 1 (single look)
+dropout_fn    <- function(n) rep(0, n)            # no dropout
 ```
 
 `rho = 0.60` represents a moderate positive correlation between the two
 endpoints - plausible when both reflect the same underlying biological process.
 The covariance matrix `Sigma` is constructed from the marginal SDs and
 correlation using the standard identity cov(y1, y2) = rho × sd1 × sd2. Treatment
-shifts are delta1 = 0.30 SD for the primary endpoint and delta2 = 0.20 SD for
+shifts are delta1 = 0.65 SD for the primary endpoint and delta2 = 0.60 SD for
 the secondary, reflecting a scenario where the primary endpoint is more
 sensitive to treatment.
 
@@ -99,6 +101,8 @@ For each arm we simulate **two correlated endpoints** per subject using
 **custom data generating model** for endpoint behavior.
 
 ```{r population}
+#| code-fold: true
+#| code-summary: "Correlated endpoint population generators for placebo and treatment arms"
 # Create closure to capture parameters
 mk_population_generator <- function(mu_y1, mu_y2) {
   function(n) {
@@ -210,6 +214,8 @@ together, so a trial that is "lucky" in one endpoint is often lucky in the other
 The following sweep quantifies marginal and joint power across four `rho` values.
 
 ```{r power_corr, cache=TRUE}
+#| code-fold: true
+#| code-summary: "Power sweep across endpoint correlations (rho = 0.0, 0.3, 0.6, 0.9)"
 set.seed(43)
 n_reps_pw <- 200
 rho_vals <- c(0.0, 0.3, 0.6, 0.9)
@@ -258,21 +264,30 @@ pw_df3 <- do.call(rbind, lapply(rho_vals, function(r) {
 ```
 
 ```{r plot_power3}
-matplot(
-  pw_df3$rho,
-  pw_df3[, c("power_y1", "power_y2", "power_joint")],
-  type = "b", pch = 19, lty = 1,
-  col  = c("steelblue", "tomato", "forestgreen"),
-  xlab = "Endpoint correlation rho",
-  ylab = "Empirical power (alpha = 0.05)",
-  main = "Marginal and joint power vs endpoint correlation",
-  ylim = c(0, 1)
+pw_long3 <- tidyr::pivot_longer(
+  pw_df3,
+  c(power_y1, power_y2, power_joint),
+  names_to = "metric", values_to = "power"
 )
-legend("topright",
-       legend = c("y1 (marginal)", "y2 (marginal)", "Joint (Holm)"),
-       col    = c("steelblue", "tomato", "forestgreen"),
-       lty = 1, pch = 19)
-abline(h = 0.80, lty = 2, col = "grey50")
+pw_long3$metric <- factor(
+  pw_long3$metric,
+  levels = c("power_y1", "power_y2", "power_joint"),
+  labels = c("y1 (marginal)", "y2 (marginal)", "Joint (Holm)")
+)
+
+ggplot(pw_long3, aes(rho, power, colour = metric)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 0.80, linetype = 2, colour = "grey50") +
+  scale_colour_manual(values = c("steelblue", "tomato", "forestgreen")) +
+  coord_cartesian(ylim = c(0, 1)) +
+  labs(
+    x = "Endpoint correlation rho",
+    y = "Empirical power (alpha = 0.05)",
+    title = "Marginal and joint power vs endpoint correlation",
+    colour = NULL
+  ) +
+  theme_minimal()
 ```
 
 ## Next steps

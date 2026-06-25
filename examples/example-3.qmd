@@ -1,5 +1,6 @@
 ---
 title: "Example 3: Multi-arm | Fixed design | Single continuous endpoint | Dunnett test + MCP-Mod"
+categories: [multi-arm, fixed design, continuous, Dunnett, MCP-Mod, dose-response]
 ---
 
 
@@ -21,6 +22,7 @@ library(DoseFinding)  # MCP-Mod
 
 # Helpers
 library(dplyr)
+library(ggplot2)
 set.seed(4566)
 ```
 
@@ -86,8 +88,8 @@ scenario <- tidyr::expand_grid(
   delta       = delta
 )
 
-enrollment_fn <- function(n) rexp(n, rate = 1)
-dropout_fn    <- function(n) rexp(n, rate = 0.01)
+enrollment_fn <- function(n) c(1, rep(0, n - 1))  # all enroll at t = 1 (single look)
+dropout_fn    <- function(n) rep(0, n)            # no dropout
 ```
 
 ## Populations
@@ -99,6 +101,8 @@ requires actual dose values - not just arm labels - to fit dose-response models
 and evaluate contrasts at analysis time.
 
 ```{r population}
+#| code-fold: true
+#| code-summary: "Dose-response population generators across placebo and active dose arms"
 mk_pop_gen <- function(d) {
   function(n) {
     mu <- mean_fun(d)
@@ -136,6 +140,8 @@ model contrast tests - a small value indicates that at least one candidate model
 detects a dose-response signal.
 
 ```{r trigger}
+#| code-fold: true
+#| code-summary: "Final analysis generator for Dunnett and MCP-Mod testing"
 # Candidate model set for MCP-Mod
 mods <- Mods(
   linear     = NULL,
@@ -228,6 +234,8 @@ We sweep `emax` over four values, keeping `ed50 = 20` and `n = 150` fixed,
 and compare the Dunnett and MCP-Mod rejection rates.
 
 ```{r power_dose, cache=TRUE}
+#| code-fold: true
+#| code-summary: "Power sweep across Emax values for Dunnett and MCP-Mod"
 set.seed(55)
 n_reps_pw <- 100
 emax_vals <- c(0.5, 1.0, 1.5, 2.0)
@@ -287,20 +295,30 @@ pw_df5 <- do.call(rbind, lapply(emax_vals, function(em) {
 ```
 
 ```{r plot_power5}
-matplot(
-  pw_df5$emax,
-  pw_df5[, c("power_dunnett", "power_mcpmod")],
-  type = "b", pch = 19, lty = 1,
-  col  = c("steelblue", "tomato"),
-  xlab = "True emax (maximum effect)",
-  ylab = "Empirical detection rate (alpha = 0.05)",
-  main = "Dunnett vs MCP-Mod: detection rate across emax",
-  ylim = c(0, 1)
+pw_long5 <- tidyr::pivot_longer(
+  pw_df5,
+  c(power_dunnett, power_mcpmod),
+  names_to = "method", values_to = "power"
 )
-legend("bottomright",
-       legend = c("Dunnett", "MCP-Mod"),
-       col = c("steelblue", "tomato"), lty = 1, pch = 19)
-abline(h = 0.80, lty = 2, col = "grey50")
+pw_long5$method <- factor(
+  pw_long5$method,
+  levels = c("power_dunnett", "power_mcpmod"),
+  labels = c("Dunnett", "MCP-Mod")
+)
+
+ggplot(pw_long5, aes(emax, power, colour = method)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 0.80, linetype = 2, colour = "grey50") +
+  scale_colour_manual(values = c("steelblue", "tomato")) +
+  coord_cartesian(ylim = c(0, 1)) +
+  labs(
+    x = "True emax (maximum effect)",
+    y = "Empirical detection rate (alpha = 0.05)",
+    title = "Dunnett vs MCP-Mod: detection rate across emax",
+    colour = NULL
+  ) +
+  theme_minimal()
 ```
 
 ## Next steps
