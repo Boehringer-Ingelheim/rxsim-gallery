@@ -1,6 +1,7 @@
 ---
 title: "Example 3: Multi-arm | Fixed design | Single continuous endpoint | Dunnett test + MCP-Mod"
 categories: [multi-arm, fixed design, continuous, Dunnett, MCP-Mod, dose-response]
+description: "Dose-response detection with Dunnett test and MCP-Mod across four active doses; `DoseFinding::MCPMod`."
 ---
 
 
@@ -310,20 +311,19 @@ ggplot(pw_long5, aes(emax, power, colour = method)) +
   geom_line() +
   geom_point(size = 2) +
   geom_hline(yintercept = 0.80, linetype = 2, colour = "grey50") +
-  scale_colour_manual(values = c("steelblue", "tomato")) +
+  scale_colour_manual(values = c("#e18600", "#076d7e")) +
   coord_cartesian(ylim = c(0, 1)) +
   labs(
     x = "True emax (maximum effect)",
     y = "Empirical detection rate (alpha = 0.05)",
     title = "Dunnett vs MCP-Mod: detection rate across emax",
     colour = NULL
-  ) +
-  theme_minimal()
+  )
 ```
 
 ## Next steps
 
 - [Example 4](example-4.html) - Bayesian Go/No-Go with historical placebo
   borrowing
-- [Population](class-population.html) - endpoint data setup for continuous,
+- [Population](https://boehringer-ingelheim.github.io/rxsim/articles/class-population.html) - endpoint data setup for continuous,
   binary, and time-to-event outcomes

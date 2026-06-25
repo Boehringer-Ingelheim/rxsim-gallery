@@ -1,6 +1,7 @@
 ---
 title: "Example 2: Two arm | Fixed design | Two correlated continuous endpoints | t-test"
 categories: [two-arm, fixed design, continuous, correlated endpoints, multiplicity, t-test]
+description: "Correlated endpoints via `MASS::mvrnorm`, Holm correction, joint vs marginal rejection rates as correlation varies."
 ---
 
 
@@ -279,22 +280,21 @@ ggplot(pw_long3, aes(rho, power, colour = metric)) +
   geom_line() +
   geom_point(size = 2) +
   geom_hline(yintercept = 0.80, linetype = 2, colour = "grey50") +
-  scale_colour_manual(values = c("steelblue", "tomato", "forestgreen")) +
+  scale_colour_manual(values = c("#e18600", "#076d7e", "#00E47C")) +
   coord_cartesian(ylim = c(0, 1)) +
   labs(
     x = "Endpoint correlation rho",
     y = "Empirical power (alpha = 0.05)",
     title = "Marginal and joint power vs endpoint correlation",
     colour = NULL
-  ) +
-  theme_minimal()
+  )
 ```
 
 ## Next steps
 
 - [Example 3](example-3.html) - adds a time-to-event endpoint alongside
   the continuous one
-- [Population](class-population.html) - endpoint data setup for continuous,
+- [Population](https://boehringer-ingelheim.github.io/rxsim/articles/class-population.html) - endpoint data setup for continuous,
   binary, and time-to-event outcomes
-- [Enrollment and Dropout](enrollment.html) - piecewise enrollment
+- [Enrollment and Dropout](https://boehringer-ingelheim.github.io/rxsim/articles/enrollment.html) - piecewise enrollment
   with `deterministic_schedule()`

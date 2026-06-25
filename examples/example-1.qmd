@@ -1,6 +1,7 @@
 ---
 title: "Example 1: Two arm | Fixed design | Continuous"
 categories: [two-arm, fixed design, continuous, t-test]
+description: "Generator API, `enroll_trigger`, and single final t-test — the minimal complete rxsim workflow."
 ---
 
 
@@ -22,7 +23,7 @@ placebo on a continuous primary endpoint (e.g., a biomarker score). 100
 subjects are randomised 1:1; a two-sample t-test is run at full enrollment. This
 is the simplest complete rxsim workflow using the generator API
 (`replicate_trial`). For a side-by-side comparison see
-[Two API Styles](api-styles.html).
+[Two API Styles](https://boehringer-ingelheim.github.io/rxsim/articles/api-styles.html).
 
 **Unique focus:** generator API, `enroll_trigger`, single final analysis.
 
@@ -154,13 +155,12 @@ ggplot(power_df, aes(delta, power)) +
     x = "True effect delta (SD units)",
     y = "Empirical power",
     title = "Power curve: n = 100, alpha = 0.05"
-  ) +
-  theme_minimal()
+  )
 ```
 
 ## Next steps
 
 - [Example 2](example-2.html) - adds a second endpoint
-- [Conditions and Triggers](conditions.html) - in-depth guide to multi-look designs
-- [Population](class-population.html) - endpoint data shapes for continuous,
+- [Conditions and Triggers](https://boehringer-ingelheim.github.io/rxsim/articles/conditions.html) - in-depth guide to multi-look designs
+- [Population](https://boehringer-ingelheim.github.io/rxsim/articles/class-population.html) - endpoint data shapes for continuous,
   binary, and time-to-event outcomes

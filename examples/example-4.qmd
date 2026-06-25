@@ -1,6 +1,7 @@
 ---
 title: "Example 4: Two-arm | Fixed design | Single continuous endpoint | Bayesian Go/No-Go with placebo borrowing"
 categories: [two-arm, fixed design, continuous, Bayesian, "Go/No-Go", borrowing]
+description: "Bayesian Go/No-Go with historical placebo borrowing via `RBesT::robustify`; OC curve across true effects."
 ---
 
 
@@ -323,8 +324,8 @@ go_df <- do.call(rbind, lapply(delta_sweep, function(dt) {
 
 ```{r plot_go}
 ggplot(go_df, aes(delta_true, go_prob)) +
-  geom_line(colour = "steelblue") +
-  geom_point(size = 2, colour = "steelblue") +
+  geom_line(colour = "#076d7e") +
+  geom_point(size = 2, colour = "#076d7e") +
   geom_vline(xintercept = delta, linetype = 3, colour = "grey50") +
   geom_hline(yintercept = gamma, linetype = 2, colour = "grey50") +
   annotate("text", x = delta, y = 0.02,
@@ -338,13 +339,12 @@ ggplot(go_df, aes(delta_true, go_prob)) +
     x = "True treatment - placebo difference",
     y = "Go probability",
     title = sprintf("Go/No-Go operating characteristics (n = %d)", sample_size)
-  ) +
-  theme_minimal()
+  )
 ```
 
 ## Next steps
 
 - [Example 5](example-5.html) - seamless Phase IIa/IIb design using
   BayesianMCPMod
-- [Conditions and Triggers](conditions.html) - adding interim looks to a Bayesian
+- [Conditions and Triggers](https://boehringer-ingelheim.github.io/rxsim/articles/conditions.html) - adding interim looks to a Bayesian
   design

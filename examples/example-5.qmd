@@ -1,6 +1,7 @@
 ---
 title: "Example 5: Seamless Ph2a/2b | Two-arm -> Multi-arm | Single continuous endpoint | Bayesian Go/No-Go + Bayesian MCP-Mod"
 categories: [seamless, multi-arm, continuous, Bayesian, "Go/No-Go", MCP-Mod]
+description: "Seamless Ph2a/2b: Bayesian Go/No-Go interim then Bayesian MCP-Mod dose-finding across the full cohort."
 ---
 
 
@@ -374,7 +375,7 @@ MCP-Mod after multi-arm expansion.
 
 ## Next steps
 
-- [Conditions and Triggers](conditions.html) - composing multiple looks with
+- [Conditions and Triggers](https://boehringer-ingelheim.github.io/rxsim/articles/conditions.html) - composing multiple looks with
   separate `Condition` objects
-- [Two API Styles](api-styles.html) - when to use direct object construction
+- [Two API Styles](https://boehringer-ingelheim.github.io/rxsim/articles/api-styles.html) - when to use direct object construction
   vs generator workflows
