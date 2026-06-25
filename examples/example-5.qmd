@@ -1,5 +1,7 @@
 ---
 title: "Example 5: Seamless Ph2a/2b | Two-arm -> Multi-arm | Single continuous endpoint | Bayesian Go/No-Go + Bayesian MCP-Mod"
+categories: [seamless, multi-arm, continuous, Bayesian, "Go/No-Go", MCP-Mod]
+description: "Seamless Ph2a/2b: Bayesian Go/No-Go interim then Bayesian MCP-Mod dose-finding across the full cohort."
 ---
 
 
@@ -47,7 +49,7 @@ A **seamless Ph2a/2b** trial with one continuous endpoint:
 - **Final**: Bayesian MCP-Mod across all doses.
 
 `dose_map` defines five arms: `d0` (placebo, 0 mg), `d5` (5 mg), `d10` (10 mg),
-`d20` (20 mg), and `d40` (40 mg). The Emax truth has `emax = 0.9` and `ed50 =
+`d20` (20 mg), and `d40` (40 mg). The Emax truth has `emax = 0.75` and `ed50 =
 15`, meaning the dose-response curve saturates around 30–40 mg. The interim
 Go/No-Go at time 4 uses `delta_interim = 0.1` and `gamma_interim = 0.8` (same
 convention as [Example 4](example-4.html)), while `alpha_final = 0.05` controls
@@ -61,7 +63,7 @@ dose_levels <- as.numeric(dose_map)
 
 # Truth for data generation (Emax shape)
 e0    <- 0.0
-emax  <- 0.9
+emax  <- 0.75
 ed50  <- 15
 sigma <- 1.0
 mean_fun <- function(d) e0 + emax * d / (ed50 + d)
@@ -219,6 +221,8 @@ Both conditions are passed to `Trial$new(conditions = ...)` and are evaluated by
 `Trial$run()` at each timepoint.
 
 ```{r analyses}
+#| code-fold: true
+#| code-summary: "Interim Go/No-Go and final Bayesian MCP-Mod analysis conditions"
 # shared state between interim and final trigger
 go_interim <- NA_integer_
 
@@ -371,7 +375,7 @@ MCP-Mod after multi-arm expansion.
 
 ## Next steps
 
-- [Conditions and Triggers](conditions.html) - composing multiple looks with
+- [Conditions and Triggers](https://boehringer-ingelheim.github.io/rxsim/articles/conditions.html) - composing multiple looks with
   separate `Condition` objects
-- [Two API Styles](api-styles.html) - when to use direct object construction
+- [Two API Styles](https://boehringer-ingelheim.github.io/rxsim/articles/api-styles.html) - when to use direct object construction
   vs generator workflows

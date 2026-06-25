@@ -1,0 +1,7 @@
+# Quarto metadata applied to all examples
+
+freeze: true
+
+execute:
+  warning: false
+  message: false
