@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -33,6 +68,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -74,7 +111,65 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author","listing-image","listing-description","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="assets/css/custom.css">
 </head>
@@ -99,16 +194,6 @@ ul.task-list li input[type="checkbox"] {
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-</ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/Boehringer-Ingelheim/rxsim"> <i class="bi bi-github" role="img">
@@ -130,15 +215,15 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    </div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="QmF5ZXNpYW4=">Bayesian <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Ym9ycm93aW5n">borrowing <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Y29udGludW91cw==">continuous <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Y29ycmVsYXRlZCUyMGVuZHBvaW50cw==">correlated endpoints <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZG9zZS1yZXNwb25zZQ==">dose-response <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RHVubmV0dA==">Dunnett <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Zml4ZWQlMjBkZXNpZ24=">fixed design <span class="quarto-category-count">(4)</span></div><div class="category" data-category="R28lMkZOby1Hbw==">Go/No-Go <span class="quarto-category-count">(2)</span></div><div class="category" data-category="TUNQLU1vZA==">MCP-Mod <span class="quarto-category-count">(2)</span></div><div class="category" data-category="bXVsdGktYXJt">multi-arm <span class="quarto-category-count">(2)</span></div><div class="category" data-category="bXVsdGlwbGljaXR5">multiplicity <span class="quarto-category-count">(1)</span></div><div class="category" data-category="c2VhbWxlc3M=">seamless <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dC10ZXN0">t-test <span class="quarto-category-count">(2)</span></div><div class="category" data-category="dHdvLWFybQ==">two-arm <span class="quarto-category-count">(3)</span></div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">rxsim Gallery</h1>
+<div class="quarto-title-block"><div><h1 class="title">rxsim Gallery</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -155,13 +240,204 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Welcome to the <strong>rxsim gallery</strong> — a collection of worked examples demonstrating rxsim’s core features for simulating clinical trials.</p>
-<p>For an overview of rxsim concepts and API, see the <a href="https://boehringer-ingelheim.github.io/rxsim">rxsim documentation</a>.</p>
-<p>Browse the <a href="./examples.html">examples</a> below to see rxsim in action across different trial designs, endpoints, and adaptive strategies.</p>
+<p>Worked examples demonstrating rxsim’s core features for simulating clinical trials — from a simple two-arm t-test to seamless adaptive designs with Bayesian borrowing.</p>
+<p>For concepts and API, see the <a href="https://boehringer-ingelheim.github.io/rxsim">rxsim documentation</a>.</p>
 
 
 
-</main> <!-- /main -->
+<!-- -->
+
+
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="listing-actions-group">
+   <div class="input-group input-group-sm quarto-listing-sort">
+    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+    <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+      <option value="" disabled="" selected="" hidden="">Order By</option>
+      <option value="index" data-direction="asc">Default</option>
+      <option value="listing-title" data-direction="asc">
+        Title
+      </option>
+      <option value="listing-author" data-direction="asc">
+        Author
+      </option>
+    </select>
+  </div>
+    <div class="input-group input-group-sm quarto-listing-filter">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="search form-control" placeholder="Filter">
+    </div>
+</div>
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-categories="dHdvLWFybSUyQ2ZpeGVkJTIwZGVzaWduJTJDY29udGludW91cyUyQ3QtdGVzdA==" data-listing-file-modified-sort="1782396240425" data-listing-reading-time-sort="5" data-listing-word-count-sort="850">
+<a href="./examples/example-1.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img loading='lazy' src="examples/example-1_files/figure-html/plot_power-1.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Example 1: Two arm | Fixed design | Continuous
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('dHdvLWFybQ=='); return false;">two-arm</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Zml4ZWQlMjBkZXNpZ24='); return false;">fixed design</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29udGludW91cw=='); return false;">continuous</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('dC10ZXN0'); return false;">t-test</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Generator API, <code>enroll_trigger</code>, and single final t-test — the minimal complete rxsim workflow.</p>
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="1" data-categories="dHdvLWFybSUyQ2ZpeGVkJTIwZGVzaWduJTJDY29udGludW91cyUyQ2NvcnJlbGF0ZWQlMjBlbmRwb2ludHMlMkNtdWx0aXBsaWNpdHklMkN0LXRlc3Q=" data-listing-file-modified-sort="1782396240425" data-listing-reading-time-sort="9" data-listing-word-count-sort="1671">
+<a href="./examples/example-2.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img loading='lazy' src="examples/example-2_files/figure-html/plot_power3-1.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Example 2: Two arm | Fixed design | Two correlated continuous endpoints | t-test
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('dHdvLWFybQ=='); return false;">two-arm</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Zml4ZWQlMjBkZXNpZ24='); return false;">fixed design</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29udGludW91cw=='); return false;">continuous</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29ycmVsYXRlZCUyMGVuZHBvaW50cw=='); return false;">correlated endpoints</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('bXVsdGlwbGljaXR5'); return false;">multiplicity</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('dC10ZXN0'); return false;">t-test</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Correlated endpoints via <code>MASS::mvrnorm</code>, Holm correction, joint vs marginal rejection rates as correlation varies.</p>
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="2" data-categories="bXVsdGktYXJtJTJDZml4ZWQlMjBkZXNpZ24lMkNjb250aW51b3VzJTJDRHVubmV0dCUyQ01DUC1Nb2QlMkNkb3NlLXJlc3BvbnNl" data-listing-file-modified-sort="1782396240425" data-listing-reading-time-sort="10" data-listing-word-count-sort="1862">
+<a href="./examples/example-3.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img loading='lazy' src="examples/example-3_files/figure-html/plot_power5-1.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Example 3: Multi-arm | Fixed design | Single continuous endpoint | Dunnett test + MCP-Mod
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('bXVsdGktYXJt'); return false;">multi-arm</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Zml4ZWQlMjBkZXNpZ24='); return false;">fixed design</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29udGludW91cw=='); return false;">continuous</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('RHVubmV0dA=='); return false;">Dunnett</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TUNQLU1vZA=='); return false;">MCP-Mod</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('ZG9zZS1yZXNwb25zZQ=='); return false;">dose-response</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Dose-response detection with Dunnett test and MCP-Mod across four active doses; <code>DoseFinding::MCPMod</code>.</p>
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="3" data-categories="dHdvLWFybSUyQ2ZpeGVkJTIwZGVzaWduJTJDY29udGludW91cyUyQ0JheWVzaWFuJTJDR28lMkZOby1HbyUyQ2JvcnJvd2luZw==" data-listing-file-modified-sort="1782396240425" data-listing-reading-time-sort="10" data-listing-word-count-sort="1944">
+<a href="./examples/example-4.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img loading='lazy' src="examples/example-4_files/figure-html/plot_go-1.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Example 4: Two-arm | Fixed design | Single continuous endpoint | Bayesian Go/No-Go with placebo borrowing
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('dHdvLWFybQ=='); return false;">two-arm</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Zml4ZWQlMjBkZXNpZ24='); return false;">fixed design</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29udGludW91cw=='); return false;">continuous</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('QmF5ZXNpYW4='); return false;">Bayesian</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R28lMkZOby1Hbw=='); return false;">Go/No-Go</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ym9ycm93aW5n'); return false;">borrowing</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Bayesian Go/No-Go with historical placebo borrowing via <code>RBesT::robustify</code>; OC curve across true effects.</p>
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="4" data-categories="c2VhbWxlc3MlMkNtdWx0aS1hcm0lMkNjb250aW51b3VzJTJDQmF5ZXNpYW4lMkNHbyUyRk5vLUdvJTJDTUNQLU1vZA==" data-listing-file-modified-sort="1782396240425" data-listing-reading-time-sort="9" data-listing-word-count-sort="1714">
+<a href="./examples/example-5.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img loading='lazy' src="assets/img/logo.svg" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Example 5: Seamless Ph2a/2b | Two-arm -&gt; Multi-arm | Single continuous endpoint | Bayesian Go/No-Go + Bayesian MCP-Mod
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('c2VhbWxlc3M='); return false;">seamless</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('bXVsdGktYXJt'); return false;">multi-arm</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y29udGludW91cw=='); return false;">continuous</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('QmF5ZXNpYW4='); return false;">Bayesian</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R28lMkZOby1Hbw=='); return false;">Go/No-Go</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TUNQLU1vZA=='); return false;">MCP-Mod</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Seamless Ph2a/2b: Bayesian Go/No-Go interim then Bayesian MCP-Mod dose-finding across the full cohort.</p>
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div></a>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -232,6 +508,57 @@ ul.task-list li input[type="checkbox"] {
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -561,7 +888,23 @@ ul.task-list li input[type="checkbox"] {
       }
     }
   });
-  </script>
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "rxsim Gallery"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">listing:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">  contents: examples</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  type: grid</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">  sort: "title"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">  categories: true</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">  filter-ui: true</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">  sort-ui: true</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">  image-placeholder: assets/img/logo.svg</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Worked examples demonstrating rxsim's core features for simulating clinical trials — from a simple two-arm t-test to seamless adaptive designs with Bayesian borrowing.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>For concepts and API, see the <span class="co">[</span><span class="ot">rxsim documentation</span><span class="co">](https://boehringer-ingelheim.github.io/rxsim)</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 
