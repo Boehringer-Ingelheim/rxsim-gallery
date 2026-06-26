@@ -1,7 +1,7 @@
 ---
 title: "Example 1: Two arm | Fixed design | Continuous"
 categories: [two-arm, fixed design, continuous, t-test]
-description: "Generator API, `enroll_trigger`, and single final t-test — the minimal complete rxsim workflow."
+description: "Generator API, `enroll_trigger`, and single final t-test: the minimal complete rxsim workflow."
 ---
 
 
@@ -121,27 +121,27 @@ scales with effect size for n = 100 at alpha = 0.05.
 #| code-fold: true
 #| code-summary: "Power curve sweep across effect sizes (delta = 0.00 to 0.60)"
 set.seed(42)
-deltas     <- seq(0, 0.6, by = 0.15)
-n_reps_pw  <- 200
+n_reps_pw <- 200
 
-power_df <- do.call(rbind, lapply(deltas, function(d) {
-  sc <- tidyr::expand_grid(sample_size = sample_size, delta = d)
+power_grid <- tibble::tibble(delta = seq(0, 0.6, by = 0.15))
+
+power_df <- purrr::pmap(power_grid, function(delta) {
   pop_gens <- list(
-    pbo = function(n) data.frame(id = 1:n, value = rnorm(n),  readout_time = 1),
-    trt = function(n) data.frame(id = 1:n, value = rnorm(n, d), readout_time = 1)
+    pbo = function(n) data.frame(id = 1:n, value = rnorm(n),        readout_time = 1),
+    trt = function(n) data.frame(id = 1:n, value = rnorm(n, delta), readout_time = 1)
   )
   an_gens <- list(final = list(
     trigger  = enroll_trigger(1.0, sample_size),
     analysis = function(df, t) {
       e <- subset(df, !is.na(enroll_time))
-      data.frame(sc, p_value = t.test(value ~ arm, data = e)$p.value)
+      data.frame(p_value = t.test(value ~ arm, data = e)$p.value)
     }
   ))
   tr <- replicate_trial("pw", sample_size, arms, allocation,
                         enrollment_fn, dropout_fn, an_gens, pop_gens, n_reps_pw)
   invisible(run_trials(tr))
-  data.frame(delta = d, power = mean(collect_results(tr)$p_value < 0.05))
-}))
+  data.frame(delta = delta, power = mean(collect_results(tr)$p_value < 0.05))
+}) |> purrr::list_rbind()
 ```
 
 ```{r plot_power}

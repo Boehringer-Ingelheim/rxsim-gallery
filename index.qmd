@@ -10,6 +10,6 @@ listing:
   image-placeholder: assets/img/logo.svg
 ---
 
-Worked examples demonstrating rxsim's core features for simulating clinical trials — from a simple two-arm t-test to seamless adaptive designs with Bayesian borrowing.
+Worked examples demonstrating rxsim's core features for simulating clinical trials, from a simple two-arm t-test to seamless adaptive designs with Bayesian borrowing.
 
 For concepts and API, see the [rxsim documentation](https://boehringer-ingelheim.github.io/rxsim).
