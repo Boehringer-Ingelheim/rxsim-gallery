@@ -186,7 +186,7 @@ trials <- replicate_trial(
   dropout               = dropout_fn,
   analysis_generators   = analysis_generators,
   population_generators = population_generators,
-  n                     = 5
+  n                     = 3
 )
 run_trials(trials)
 ```
@@ -219,25 +219,20 @@ The following sweep quantifies marginal and joint power across four `rho` values
 #| code-summary: "Power sweep across endpoint correlations (rho = 0.0, 0.3, 0.6, 0.9)"
 set.seed(43)
 n_reps_pw <- 200
-rho_vals <- c(0.0, 0.3, 0.6, 0.9)
 
-pw_df3 <- do.call(rbind, lapply(rho_vals, function(r) {
-  Sig_r <- matrix(c(1, r, r, 1), 2)
+rho_grid <- tibble::tibble(rho = c(0.0, 0.3, 0.6, 0.9))
+
+pw_df3 <- purrr::pmap(rho_grid, function(rho) {
+  Sig_r <- matrix(c(1, rho, rho, 1), 2)
   pop_pw <- list(
-    pbo = local({
-      S <- Sig_r
-      function(n) {
-        xy <- MASS::mvrnorm(n, c(0, 0), S)
-        data.frame(id = 1:n, y1 = xy[, 1], y2 = xy[, 2], readout_time = 1)
-      }
-    }),
-    trt = local({
-      S <- Sig_r
-      function(n) {
-        xy <- MASS::mvrnorm(n, c(delta1, delta2), S)
-        data.frame(id = 1:n, y1 = xy[, 1], y2 = xy[, 2], readout_time = 1)
-      }
-    })
+    pbo = function(n) {
+      xy <- MASS::mvrnorm(n, c(0, 0), Sig_r)
+      data.frame(id = 1:n, y1 = xy[, 1], y2 = xy[, 2], readout_time = 1)
+    },
+    trt = function(n) {
+      xy <- MASS::mvrnorm(n, c(delta1, delta2), Sig_r)
+      data.frame(id = 1:n, y1 = xy[, 1], y2 = xy[, 2], readout_time = 1)
+    }
   )
   an_pw <- list(final = list(
     trigger  = enroll_trigger(1.0, sample_size),
@@ -256,12 +251,12 @@ pw_df3 <- do.call(rbind, lapply(rho_vals, function(r) {
   invisible(run_trials(tr))
   res <- collect_results(tr)
   data.frame(
-    rho           = r,
-    power_y1      = mean(res$p1  < 0.05),
-    power_y2      = mean(res$p2  < 0.05),
-    power_joint   = mean(res$pa1 < 0.05 & res$pa2 < 0.05)
+    rho         = rho,
+    power_y1    = mean(res$p1  < 0.05),
+    power_y2    = mean(res$p2  < 0.05),
+    power_joint = mean(res$pa1 < 0.05 & res$pa2 < 0.05)
   )
-}))
+}) |> purrr::list_rbind()
 ```
 
 ```{r plot_power3}

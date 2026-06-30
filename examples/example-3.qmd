@@ -239,22 +239,15 @@ and compare the Dunnett and MCP-Mod rejection rates.
 #| code-summary: "Power sweep across Emax values for Dunnett and MCP-Mod"
 set.seed(55)
 n_reps_pw <- 100
-emax_vals <- c(0.5, 1.0, 1.5, 2.0)
 
-pw_df5 <- do.call(rbind, lapply(emax_vals, function(em) {
-  mf <- function(d) 0 + em * d / (20 + d)
+emax_grid <- tibble::tibble(emax = c(0.5, 1.0, 1.5, 2.0))
+
+pw_df5 <- purrr::pmap(emax_grid, function(emax) {
+  mf <- function(d) emax * d / (20 + d)
   pop_pw <- lapply(seq_along(doses), function(i) {
-    d <- doses[i]
-    local({
-      mu_d <- mf(d)
-      function(n) {
-        data.frame(
-          id = 1:n, dose = d,
-          y  = rnorm(n, mu_d, sigma),
-          readout_time = 1
-        )
-      }
-    })
+    d    <- doses[i]
+    mu_d <- mf(d)
+    function(n) data.frame(id = 1:n, dose = d, y = rnorm(n, mu_d, sigma), readout_time = 1)
   })
   names(pop_pw) <- arm_names
 
@@ -266,18 +259,16 @@ pw_df5 <- do.call(rbind, lapply(emax_vals, function(em) {
           arm  = factor(arm, levels = arm_names),
           dose = as.numeric(dose)
         )
-      fit  <- lm(y ~ arm, data = df_e)
-      dun  <- multcomp::glht(fit, linfct = multcomp::mcp(arm = "Dunnett"))
-      mm   <- DoseFinding::MCPMod(
+      fit <- lm(y ~ arm, data = df_e)
+      dun <- multcomp::glht(fit, linfct = multcomp::mcp(arm = "Dunnett"))
+      mm  <- DoseFinding::MCPMod(
         dose = df_e$dose, resp = df_e$y,
         models = mods, type = "normal",
         Delta = delta, alpha = alpha, selModel = "aveAIC"
       )
       data.frame(
         dunn_sig   = as.integer(min(summary(dun)$test$pvalues) < alpha),
-        mcpmod_sig = as.integer(
-          min(attr(mm$MCTtest$tStat, "pVal"), na.rm = TRUE) < alpha
-        )
+        mcpmod_sig = as.integer(min(attr(mm$MCTtest$tStat, "pVal"), na.rm = TRUE) < alpha)
       )
     }
   ))
@@ -288,11 +279,11 @@ pw_df5 <- do.call(rbind, lapply(emax_vals, function(em) {
   invisible(run_trials(tr))
   res <- collect_results(tr)
   data.frame(
-    emax          = em,
+    emax          = emax,
     power_dunnett = mean(res$dunn_sig),
     power_mcpmod  = mean(res$mcpmod_sig)
   )
-}))
+}) |> purrr::list_rbind()
 ```
 
 ```{r plot_power5}

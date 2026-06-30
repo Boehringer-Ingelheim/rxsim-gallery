@@ -235,7 +235,7 @@ trials <- replicate_trial(
   dropout               = dropout_fn,
   analysis_generators   = analysis_generators,
   population_generators = population_generators,
-  n                     = 5
+  n                     = 3
 )
 run_trials(trials)
 ```
@@ -263,83 +263,74 @@ replicate_results
 `decision_go = 1` indicates Go; `decision_go = 0` indicates No-Go under the
 criterion P(Delta > 0.1 | data) >= 0.8.
 
-## Go probability curve
+## Comparing go decision boundaries
 
-The operating characteristics of a Bayesian Go/No-Go design are summarised by
-the Go probability under a range of true treatment effects: near zero for small
-effects (false Go = type I error analog) and approaching 1 for large effects.
+The choice of go boundary γ controls the tradeoff between false-Go rate (under
+the null, δ = 0) and true-Go rate (under the alternative, δ = 0.4). Stricter
+boundaries (higher γ) reduce false Go decisions at the cost of missing real
+effects. Since the posterior probability `post_prob_delta` does not depend on γ,
+we simulate both truths once and apply γ ∈ {0.7, 0.8, 0.9} in post-processing;
+two simulation runs, not six.
 
-```{r go_curve, cache=TRUE}
+```{r go_boundaries, cache=TRUE}
 #| code-fold: true
-#| code-summary: "Go probability sweep across true treatment effects"
+#| code-summary: "Collect posterior probabilities for null and alternative, then apply go boundaries"
 set.seed(77)
-n_reps_pw   <- 200
-delta_sweep <- c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)
+n_reps_oc <- 300
 
-go_df <- do.call(rbind, lapply(delta_sweep, function(dt) {
-  pop_pw <- list(
-    placebo = function(n) {
-      data.frame(
-        id = 1:n, y = rnorm(n, 0, sigma_known), readout_time = 1
-      )
-    },
-    treatment = local({
-      d <- dt
-      function(n) {
-        data.frame(
-          id = 1:n,
-          y  = rnorm(n, d, sigma_known),
-          readout_time = 1
-        )
-      }
+truths <- tibble::tibble(delta_true = c(0, 0.4))
+
+post_by_truth <- purrr::pmap(truths, function(delta_true) {
+  pop_oc <- list(
+    placebo   = function(n) data.frame(id = 1:n, y = rnorm(n, 0,           sigma_known), readout_time = 1),
+    treatment = local({ d <- delta_true
+      function(n) data.frame(id = 1:n, y = rnorm(n, d, sigma_known), readout_time = 1)
     })
   )
-  an_pw <- list(final = list(
+  an_oc <- list(final = list(
     trigger  = enroll_trigger(1.0, sample_size),
     analysis = function(df, ct) {
       dat <- dplyr::filter(df, !is.na(enroll_time)) |>
         dplyr::mutate(arm = factor(arm, levels = c("placebo", "treatment")))
-      y_p <- dat$y[dat$arm == "placebo"]
-      y_t <- dat$y[dat$arm == "treatment"]
-      pp  <- RBesT::postmix(prior_placebo,   n = length(y_p), m = mean(y_p))
-      pt  <- RBesT::postmix(prior_treatment, n = length(y_t), m = mean(y_t))
-      data.frame(
-        go = as.integer(
-          RBesT::pmixdiff(pt, pp, delta, lower.tail = FALSE) >= gamma
-        )
-      )
+      pp <- RBesT::postmix(prior_placebo,   n = sum(dat$arm == "placebo"),   m = mean(dat$y[dat$arm == "placebo"]))
+      pt <- RBesT::postmix(prior_treatment, n = sum(dat$arm == "treatment"), m = mean(dat$y[dat$arm == "treatment"]))
+      data.frame(post_prob = RBesT::pmixdiff(pt, pp, delta, lower.tail = FALSE))
     }
   ))
-  tr <- replicate_trial(
-    "pw7", sample_size, arms, allocation,
-    enrollment_fn, dropout_fn, an_pw, pop_pw, n_reps_pw
-  )
+  tr <- replicate_trial("oc", sample_size, arms, allocation,
+                        enrollment_fn, dropout_fn, an_oc, pop_oc, n_reps_oc)
   invisible(run_trials(tr))
-  data.frame(
-    delta_true   = dt,
-    go_prob      = mean(collect_results(tr)$go)
-  )
-}))
+  collect_results(tr) |> dplyr::transmute(delta_true = delta_true, post_prob)
+}) |> purrr::list_rbind()
+
+# Apply each go boundary in post-processing
+go_oc <- tidyr::expand_grid(go_boundary = c(0.7, 0.8, 0.9), delta_true = c(0, 0.4)) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(
+    scenario = if (delta_true == 0) "null (d=0)" else "alt (d=0.4)",
+    go_prob  = mean(post_by_truth$post_prob[post_by_truth$delta_true == delta_true] >= go_boundary)
+  ) |>
+  dplyr::ungroup()
+go_oc
 ```
 
 ```{r plot_go}
-ggplot(go_df, aes(delta_true, go_prob)) +
-  geom_line(colour = "#076d7e") +
-  geom_point(size = 2, colour = "#076d7e") +
-  geom_vline(xintercept = delta, linetype = 3, colour = "grey50") +
-  geom_hline(yintercept = gamma, linetype = 2, colour = "grey50") +
-  annotate("text", x = delta, y = 0.02,
-           label = sprintf("delta threshold = %.1f", delta),
-           hjust = -0.05, colour = "grey40", size = 3) +
-  annotate("text", x = min(go_df$delta_true), y = gamma,
-           label = sprintf("gamma threshold = %.1f", gamma),
-           vjust = -0.5, hjust = 0, colour = "grey40", size = 3) +
+ggplot(go_oc, aes(factor(go_boundary), go_prob, fill = scenario)) +
+  geom_col(position = "dodge") +
+  geom_hline(yintercept = 0.05, linetype = 3, colour = "grey50") +
   coord_cartesian(ylim = c(0, 1)) +
+  scale_fill_manual(values = c("#e18600", "#076d7e")) +
   labs(
-    x = "True treatment - placebo difference",
-    y = "Go probability",
-    title = sprintf("Go/No-Go operating characteristics (n = %d)", sample_size)
+    x     = "Go boundary \u03b3",
+    y     = "P(Go)",
+    fill  = NULL,
+    title = "False-Go and true-Go rate across go boundaries"
   )
+```
+
+```{r go-self-check, include=FALSE}
+# Stricter boundary must not increase the false-Go rate
+stopifnot(all(diff(go_oc$go_prob[go_oc$scenario == "null (d=0)"]) <= 0))
 ```
 
 ## Next steps
