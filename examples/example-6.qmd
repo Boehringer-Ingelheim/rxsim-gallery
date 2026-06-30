@@ -25,8 +25,8 @@ A fixed single-look design and a group-sequential (GS) design with an early-stop
 rule achieve similar type-I error and power, but the GS design can stop early under
 the alternative, spending fewer patients on average. This example compares the two
 side-by-side using a **design table** (a `tibble` where each row is a design) mapped
-with `purrr::pmap`. The approach mirrors how 1479-style analyses enumerate multiple
-trial strategies, and scales naturally to more designs or scenarios.
+with `purrr::pmap`. The approach enumerate multiple trial strategies, and scales 
+naturally to more designs or scenarios.
 
 **Unique focus:** design-table pattern, `purrr::pmap` over a scenario grid, 2-look
 O'Brien-Fleming group-sequential, operating characteristics (type-I, power, expected N).
@@ -59,7 +59,7 @@ narrower than the fixed design's. Together the two bounds preserve overall `Î± â
 sample_size <- 100
 arms        <- c("pbo", "trt")
 allocation  <- c(1, 1)
-n_reps      <- 300   # replicates per scenario row
+n_reps      <- 1000   # replicates per scenario row
 
 # Block accrual: 10 subjects per time unit.
 # Interim (50 enrolled) fires at t = 5; final (100 enrolled) at t = 10.

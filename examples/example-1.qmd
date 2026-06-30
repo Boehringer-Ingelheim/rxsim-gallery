@@ -96,7 +96,7 @@ trials <- replicate_trial(
   dropout               = dropout_fn,
   analysis_generators   = analysis_generators,
   population_generators = population_generators,
-  n                     = 5
+  n                     = 3
 )
 ```
 
